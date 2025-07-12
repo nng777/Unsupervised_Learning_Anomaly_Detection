@@ -189,7 +189,10 @@ class InfluencerFraudDetector:
                 .head())
 
             # Save the full list of flagged accounts for offline review
-            flagged.to_csv("flagged_influencers.csv", index=False)
+            export_df = flagged.copy()
+            num_cols = export_df.select_dtypes(include=[np.number]).columns
+            export_df[num_cols] = export_df[num_cols].round().astype(int)
+            export_df.to_csv("flagged_influencers.csv", index=False)
 
     def run(self):
         self.generate_influencer_data()
