@@ -1,4 +1,5 @@
-"""Task 1
+"""
+Task 1
 
 Step 1: Modify customer_behavior_analyzer.py to analyze these influencer metrics:
 
