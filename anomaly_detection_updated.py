@@ -174,25 +174,24 @@ class InfluencerFraudDetector:
         flagged = self.data[self.data["pred_fake"]]
         if not flagged.empty:
             print("Accounts require review:")
-            print(flagged[
-                    [
-                        "influencer_id",
-                        "followers_count",
-                        "posts_per_week",
-                        "avg_likes_per_post",
-                        "avg_comments_per_post",
-                        "engagement_rate",
-                    ]
-                ]
-                .round()
-                .astype(int)
-                .head())
+            cols = [
+                "followers_count",
+                "posts_per_week",
+                "avg_likes_per_post",
+                "avg_comments_per_post",
+                "engagement_rate",
+            ]
+            display_df = flagged[["influencer_id", *cols]].copy()
+            num_cols = display_df.select_dtypes(include=[np.number]).columns
+            display_df[num_cols] = display_df[num_cols].round().astype(int)
+            print(display_df.head())
 
             # Save the full list of flagged accounts for offline review
-            export_df = flagged.copy()
-            num_cols = export_df.select_dtypes(include=[np.number]).columns
+            export_df = flagged[["influencer_id", *cols]].copy()
+
             export_df[num_cols] = export_df[num_cols].round().astype(int)
             export_df.to_csv("flagged_influencers.csv", index=False)
+
 
     def run(self):
         self.generate_influencer_data()
