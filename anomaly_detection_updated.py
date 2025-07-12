@@ -99,7 +99,7 @@ class InfluencerFraudDetector:
                 df.at[idx, "avg_comments_per_post"] = likes * 0.02
                 df.at[idx, "engagement_rate"] = likes / df.at[idx, "followers_count"] * 100
 
-        self.data = df.abs()
+        #self.data = df.abs()
 
         numeric_cols = df.select_dtypes(include=[np.number]).columns
         df[numeric_cols] = df[numeric_cols].abs()
