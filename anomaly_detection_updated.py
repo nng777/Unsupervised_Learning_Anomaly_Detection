@@ -47,17 +47,20 @@ class InfluencerFraudDetector:
             },
         }
 
-        all_data = {f: [] for f in [
+        features = [
             "followers_count",
             "posts_per_week",
             "avg_likes_per_post",
             "avg_comments_per_post",
             "engagement_rate",
-        ]}
+        ]
 
-        for params in segments.values():
-            size = params.pop("size")
-            for feature, (mean, std) in params.items():
+        all_data = {f: [] for f in features}
+
+        for seg_params in segments.values():
+            size = seg_params["size"]
+            for feature in features:
+                mean, std = seg_params[feature]
                 all_data[feature].extend(rng.normal(mean, std, size))
 
         df = pd.DataFrame(all_data)
@@ -97,6 +100,11 @@ class InfluencerFraudDetector:
                 df.at[idx, "engagement_rate"] = likes / df.at[idx, "followers_count"] * 100
 
         self.data = df.abs()
+
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        df[numeric_cols] = df[numeric_cols].abs()
+        self.data = df
+
         # Save generated influencer data for external review
         self.data.to_csv("influencer_data.csv", index=False)
         return self.data
@@ -181,7 +189,7 @@ class InfluencerFraudDetector:
                 .head())
 
             # Save the full list of flagged accounts for offline review
-            #flagged.to_csv("flagged_influencers.csv", index=False)
+            flagged.to_csv("flagged_influencers.csv", index=False)
 
     def run(self):
         self.generate_influencer_data()
